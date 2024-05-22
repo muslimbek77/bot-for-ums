@@ -74,6 +74,28 @@ class Database:
     def all_users_id(self):
         return self.execute("SELECT telegram_id FROM Users;", fetchall=True)
 
+    def create_table_ums(self):
+        sql = """
+        CREATE TABLE IF NOT EXISTS UMS(
+        id TEXT unique,
+        name TEXT,
+        latitude TEXT,
+        longitude TEXT,
+        address TEXT,
+        contact TEXT,);
+              """
+        self.execute(sql, commit=True)
+
+    def add_ums(self, id:str, address:str,name:str,latitude:str,longitude:str,contact:str):
+
+        sql = """
+        INSERT INTO UMS(id, name,latitude,longitude, contact, address) VALUES(?, ?, ?, ?, ?, ?);
+        """
+        self.execute(sql, parameters=(id, name,latitude,longitude, contact, address), commit=True)
+
+
+
+
 def logger(statement):
     print(f"""
 _____________________________________________________        

@@ -40,6 +40,7 @@ def setup_middlewares(dispatcher: Dispatcher, bot: Bot) -> None:
 async def main() -> None:
     await set_default_commands(bot)
     db.create_table_users()
+    db.create_table_ums()
     setup_middlewares(dispatcher=dp, bot=bot)
     await dp.start_polling(bot)
 
