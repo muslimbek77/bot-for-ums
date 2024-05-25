@@ -49,7 +49,7 @@ class Database:
         INSERT INTO Users(telegram_id, full_name) VALUES(?, ?);
         """
         self.execute(sql, parameters=(telegram_id, full_name), commit=True)
-
+    
 
     def select_all_users(self):
         sql = """
@@ -82,17 +82,23 @@ class Database:
         latitude TEXT,
         longitude TEXT,
         address TEXT,
-        contact TEXT,);
+        contact TEXT);
               """
         self.execute(sql, commit=True)
 
-    def add_ums(self, id:str, address:str,name:str,latitude:str,longitude:str,contact:str):
+    def add_ums(self, id:str, address:str,name:str,latitude:str,longitude:str,contact:str="malumot yo'q"):
 
         sql = """
         INSERT INTO UMS(id, name,latitude,longitude, contact, address) VALUES(?, ?, ?, ?, ?, ?);
         """
         self.execute(sql, parameters=(id, name,latitude,longitude, contact, address), commit=True)
 
+    def get_ums(self,id:str):
+        sql = """
+        SELECT * from UMS WHERE id=?;
+        """
+        
+        return self.execute(sql, parameters=(id,), fetchone=True)
 
 
 
