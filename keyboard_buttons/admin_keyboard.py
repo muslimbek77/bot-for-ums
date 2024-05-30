@@ -6,6 +6,10 @@ admin_button = ReplyKeyboardMarkup(
         [
             KeyboardButton(text="Foydalanuvchilar soni"),
             KeyboardButton(text="Reklama yuborish"),
+        ],
+         [
+            KeyboardButton(text="Bazani o'zgartirish"),
+            KeyboardButton(text="Yangi bazaga qo'shish"),
         ]
         
     ],

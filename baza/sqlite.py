@@ -1,6 +1,7 @@
 import sqlite3
 
 
+
 class Database:
     def __init__(self, path_to_db="main.db"):
         self.path_to_db = path_to_db
@@ -95,12 +96,25 @@ class Database:
 
     def get_ums(self,id:str):
         sql = """
-        SELECT * from UMS WHERE id=?;
+        SELECT * from UMS WHERE id LIKE ?;
         """
+        name_with_wildcards = f"%{id}%"
+        return self.execute(sql, parameters=(name_with_wildcards,), fetchone=True)
+
+    def get_ums_name(self,name:str):
+        sql = """
+        SELECT * from UMS WHERE name LIKE ?;
+        """
+        name_with_wildcards = f"%{name}%"
         
-        return self.execute(sql, parameters=(id,), fetchone=True)
+        return self.execute(sql, parameters=(name_with_wildcards,), fetchone=True)
 
-
+    def set_ums_location(self,id:str,latitude:str,longitude:str):
+        sql = """
+        UPDATE UMS SET latitude = ?, longitude = ? WHERE id = ?;
+        """
+        self.execute(sql, parameters=(latitude,longitude,id), commit=True)
+    
 
 def logger(statement):
     print(f"""

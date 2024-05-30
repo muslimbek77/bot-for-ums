@@ -1,10 +1,9 @@
-from filters.check_sub_channel import IsCheckSubChannels
 from loader import bot,db,dp,CHANNELS,ADMINS
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 from aiogram.types import Message,InlineKeyboardButton
 from aiogram.filters import Command
 from filters.admin import IsBotAdminFilter
-from states.reklama import Adverts
+from states.reklama import UMS, Adverts
 from aiogram.fsm.context import FSMContext #new
 from keyboard_buttons import admin_keyboard
 import time 
@@ -24,18 +23,18 @@ from aiogram import F
 
 
 
-#help commands
-@dp.message(Command("help"))
-async def help_commands(message:Message):
-    await message.answer("Sizga qanday yordam kerak")
-
-
-
-#about commands
-@dp.message(Command("about"))
-async def about_commands(message:Message):
-    await message.answer("Sifat 2024")
-
+def dms_to_decimal(dms_str):#41°15'34"N 64°35'02"E
+  try:
+    degrees, minutes_seconds = dms_str.split("°")
+    degrees = float(degrees)
+    minutes, seconds_str = minutes_seconds.split("'")
+    minutes = float(minutes)
+    # Replace comma with decimal point and remove trailing quotation mark
+    seconds = float(seconds_str.replace(',', '.').replace('"', ''))
+    return float(degrees) + (float(minutes) / 60) + (seconds / 3600)
+  except ValueError:
+    # Handle invalid DMS format
+    return None
 
 @dp.message(Command("admin"),IsBotAdminFilter(ADMINS))
 async def is_admin(message:Message):
@@ -71,3 +70,32 @@ async def send_advert(message:Message,state:FSMContext):
     await message.answer(f"Reklama {count}ta foydalanuvchiga yuborildi")
     await state.clear()
 
+@dp.message(F.text=="Bazani o'zgartirish",IsBotAdminFilter(ADMINS))
+async def edit_db(message:Message,state:FSMContext):
+    await state.set_state(UMS.ums)
+    await message.answer(text="O'zgartirmoqchi bo'lgan baza id sini kiriting")
+
+@dp.message(F.text,UMS.ums)
+async def edit_db_id(message:Message,state:FSMContext):
+    id = message.text
+    await state.update_data(id=id)
+    await state.set_state(UMS.location)
+    await message.answer(text="O'zgartirmoqchi bo'lgan baza locatsiyasini kiriting")
+
+@dp.message(F.text,UMS.location)
+async def edit_db_loc(message:Message,state:FSMContext):
+    # try:
+        lat,long = message.text.split() #40°16'26"N 65°09'28"E
+        lat = dms_to_decimal(lat[:-1])
+        long = dms_to_decimal(long[:-1])
+        data = await state.get_data()
+        id = data.get("id")
+        db.set_ums_location(id,lat,long)
+        await message.answer(text="Baza o'zgartirildi")
+    # except:
+    #     await message.answer(text="Malumot topilmadi")
+        await state.clear()
+
+@dp.message(F.text=="Yangi bazaga qo'shish",IsBotAdminFilter(ADMINS))
+async def add_db(message:Message):
+    await message.answer(text="Yangi bazaga qo'shish")
